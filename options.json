@@ -1,0 +1,39 @@
+{
+    "questions" :{
+        "welcome_1" : {
+            "type" : "text",
+            "question" : "Welcome to the survey. Please answer the following questions.",
+            "op_1" : "",
+            "next" : "1"
+        },
+        "1": {
+            "question": "What is your favourite colour?",
+            "op_1": "Red",
+            "next": "2",
+            "failed" : "1.5"
+        },
+        "1.5": {
+            "question": "What is your favourite colour?",
+            "op_1": "Red",
+            "next": "2",
+            "failed" : "1.8"
+        },
+        "1.8" : {
+            "question": "What is your favourite colour?",
+            "op_1": "Red",
+            "next": "2",
+            "failed" : "1.5"
+        },
+        "2": {
+            "question": "What is your favourite colour?",
+            "op_1": "Red",
+            "next": "3",
+            "failed" : "2.5"
+        }
+    },
+    "lvls" : {
+        "1": ["1", "1.5", "1.8"],
+        "2": ["2", "2.5", "2.8"],
+        "3": ["3", "3.5", "3.8"]
+    }
+}

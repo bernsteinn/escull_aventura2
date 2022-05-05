@@ -1,0 +1,122 @@
+@font-face {
+    font-family: 'Titol';
+    src: url('/fonts/Tapestry-regular.ttf');
+}
+
+
+body {
+    overflow: hidden;
+}
+
+#app {
+    position:relative;
+    left:-15px;
+    top:-22px;
+}
+
+.title {
+    z-index: 5;
+    font-family: 'Titol';
+    font-size: 50px;
+    position: absolute;
+    top: 25%;
+    right: 70%;
+    width: 300px;
+    color: white;
+}
+
+.subtitle {
+    z-index: 5;
+    font-style: italic;
+    position: absolute;
+    font-size:25px;
+    top: 45%;
+    right: 70%;
+    width: 300px;
+    color: white;
+}
+
+.author {
+    z-index: 5;
+    position:absolute;
+    top: 50%;
+    right: 70%;
+    width: 300px;
+    color: white;
+}
+
+.start {
+    z-index: 5;
+    position: absolute;
+    left:50%;
+    top:50%;
+    border: 1px solid currentColor;
+  
+  outline: none;
+  height: 40px;
+  text-align: center;
+  width: 130px;
+  border-radius: 40px;
+  background: #fff;
+  border: 2px solid #1ECD97;
+  color: #1ECD97;
+  letter-spacing: 1px;
+  text-shadow: 0;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+button:hover {
+  color: white;
+  background: #1ECD97;
+}
+button:active {
+  letter-spacing: 2px;
+}
+
+
+.onclic {
+  width: 40px;
+  border-color: #bbbbbb;
+  border-width: 3px;
+  font-size: 0;
+  border-left-color: #1ECD97;
+  -webkit-animation: rotating 2s 0.25s linear infinite;
+          animation: rotating 2s 0.25s linear infinite;
+}
+.onclic:after {
+  content: "";
+}
+.onclic:hover {
+  color: #1ECD97;
+  background: white;
+}
+
+.validate {
+  font-size: 13px;
+  color: white;
+  background: #1ECD97;
+}
+.validate:after {
+  font-family: "FontAwesome";
+  content: "";
+}
+
+@-webkit-keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
