@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escull la teva aventura | Ara que estem junts</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="/loading-bar.js"></script>
+    <link rel="stylesheet" href="/css/game.css">
+</head>
+<body class="loadingBody" id="body">
+    <div class="ldBar" id="ldBar" data-value="0" data-duration="7"></div>
+    <script>
+      var bar = new ldBar(".ldBar", {
+   "stroke": '#f00',
+   "stroke-width": 15,
+   "preset": "bubble",
+   "value": 0
+  });
+  var loaded;
+  setTimeout(function() {
+    const scriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    document.body.appendChild(script);
+    script.onload = resolve;
+    script.onerror = reject;
+    script.async = true;
+    script.src = '/vue.global.js';
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css'
+    link.href = '/css/bubble.css'
+    var head = document.getElementsByTagName('HEAD')[0]
+    head.appendChild(link)
+});
+    scriptPromise.then(() =>{bar.set(bar.value+20)})
+  }, 3000)
+  bar.set(bar.value+60)
+  setTimeout(function() {
+      bar.set(bar.value+50)
+  }, 4000)
+  setTimeout(function() {
+      loaded = true
+  }, 6000)
+  var loadingN = setInterval(() => {
+      if(loaded == true) {
+      var loadingBody = document.getElementById("body")
+      var loadingBar = document.getElementById("ldBar")
+      loadingBody.classList.remove("loadingBody")
+      loadingBar.remove()
+      <%= started = true %>
+      clearInterval(loadingN)
+      }
+  }, 10);
+
+
+  
+    </script>
+
+<% if(started == true){ %>
+    <script>
+
+setTimeout(function() {
+    const scriptPromise = new Promise((resolve, reject) => {
+    const script1 = document.createElement('script');
+    document.body.appendChild(script1);
+    script1.onload = resolve;
+    script1.onerror = reject;
+    script1.async = true;
+    script1.src = '/game/game.js';
+});
+    scriptPromise.then(() =>{})
+  }, 5000)
+
+    </script>
+
+<% } %> 
+</body>
+</html>

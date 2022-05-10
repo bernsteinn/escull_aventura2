@@ -21,6 +21,9 @@ app.set('view engine', 'ejs');
 app.get("/", (req, res) => {
     res.render('main.ejs');
 })
+app.get("/game", (req, res) => {
+    res.render('game.ejs')
+})
 app.post("/questions", (req,res) => {
     const id = req.body.qID
     const user = req.body.user
@@ -33,12 +36,7 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('user disconnected');
     });
-    socket.on("question", (data) => {
-        var info = jsonQuestions.questions[data]
-        io.emit("questionData", info)
-    })
-});
-
+})
 //Server.
 server.listen(port, () => console.log(`Listening on port ${port}`));
 

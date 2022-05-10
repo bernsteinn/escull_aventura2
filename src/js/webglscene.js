@@ -16,7 +16,7 @@ export function render_welcome_scene(){
         document.body.appendChild(container)
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.setSize( window.innerWidth+30, window.innerHeight+10 );
+        renderer.setSize( window.innerWidth+30, window.innerHeight+20 );
         renderer.setAnimationLoop( animation );
         renderer.outputEncoding = THREE.sRGBEncoding;
         container.appendChild( renderer.domElement );
@@ -71,7 +71,7 @@ export function render_welcome_scene(){
 
     function onWindowResize() {
 
-        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setSize( window.innerWidth+30, window.innerHeight+20 );
         camera.aspect = ( window.innerWidth / window.innerHeight );
         camera.updateProjectionMatrix();
 
@@ -90,10 +90,6 @@ export function render_welcome_scene(){
         renderer.render( scene, camera );
     }  
     function animation2(x, y, z , time){
-        setTimeout(function() {
-            done1 = true
-        }, 3000)
-        if(done1 == true){animation3(x, y, z, time ); return}
         const mesh = scene.getObjectByName( 'meshKnot' );
         mesh.rotation.y = time / 1000
         camera.position.set( x, y, z );
@@ -138,7 +134,7 @@ export function webgl_support () {
         start : function start(){
             this.user = localStorage.getItem("user");
             if(this.user != null){
-                this.zoomIn(20);
+                window.location = "/game"
             }
             else{
                 swal({
@@ -152,6 +148,7 @@ export function webgl_support () {
                 }).then(username => {
                     if(username){
                         localStorage.setItem("user", username)
+                        localStorage.setItem("lvl", 0)
                         this.start()
                     }
                 })
