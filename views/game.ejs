@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escull la teva aventura | Ara que estem junts</title>
-    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/loadingBody.css"> 
     <script src="/loading-bar.js"></script>
     <link rel="stylesheet" href="/css/game.css">
 </head>
@@ -21,12 +21,6 @@
   var loaded;
   setTimeout(function() {
     const scriptPromise = new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    document.body.appendChild(script);
-    script.onload = resolve;
-    script.onerror = reject;
-    script.async = true;
-    script.src = '/vue.global.js';
     var link = document.createElement('link');
     link.rel = 'stylesheet';
     link.type = 'text/css'
@@ -68,7 +62,13 @@ setTimeout(function() {
     script1.onload = resolve;
     script1.onerror = reject;
     script1.async = true;
-    script1.src = '/game/game.js';
+    script1.src = '/socket.io/socket.io.js';
+    const script2 = document.createElement('script');
+    document.body.appendChild(script2);
+    script2.onerror = reject
+    script2.onload = resolve;
+    script2.async = true
+    script2.src = "/game/game.js"
 });
     scriptPromise.then(() =>{})
   }, 5000)

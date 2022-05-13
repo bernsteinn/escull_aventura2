@@ -4,6 +4,8 @@
 }
 
 .bubble{
+    animation-name: appearance;
+    animation-duration: 1s;
     background-color: #F2F2F2;
     font-size: 20px;
     border-radius: 5px;
@@ -130,27 +132,6 @@
 .hidden {
   display: none;
 }
-.options{
-  display: grid;
-  position: relative;
-}
-
-@media  screen and (min-width: 400px) {
-  .options{}
-}
-@media  screen and (min-width: 720px) {
-  .options{width: 300px;height: 100px;position: relative;left: 800px;bottom: 450px;grid-gap: 50px;}
-}
-@media  screen and (min-width: 1300px) {
-  .options{position: relative; left: 850px;grid-gap:50px;}
-}
-@media  screen and (min-width: 1600px) {
-  .options{position: relative;left: 1000px;grid-gap: 75px;}
-}
-
-@media  screen and (min-width: 1920px) {
-  .options{position: relative;left:1250px;grid-gap: 100px;}
-}
 
 #submit1, #submit2, #submit3, #submit4{
     position: relative;
@@ -204,4 +185,19 @@
   
   strong{
     font-size:200px;
+  }
+
+  @keyframes appearance {
+    20%, 80%{transform: translateY(0);} 
+    0%{
+      rotate: -90deg; left:60%; transform: translateY(0);
+    }
+    40%{transform: translateY(-30px)}
+    50% {
+      rotate: 0deg; left:65%;    transform: translateY(0);
+    }
+    60%{transform: translateY(-15px)}
+    100%{
+      transform: translateY(0);
+    }
   }

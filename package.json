@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack  --config webpack.config.js",
-    "build-game":"webpack --config webpack.config-game.js"
+    "build-game": "webpack --config webpack.config-game.js"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +20,7 @@
     "ejs": "^3.1.6",
     "esbuild-loader": "^2.18.0",
     "express": "^4.17.3",
+    "gsap": "^3.10.4",
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.6.0",
     "socket.io": "^4.4.1",

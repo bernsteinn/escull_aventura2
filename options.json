@@ -7,8 +7,9 @@
             "next" : "1"
         },
         "1": {
-            "question": "What is your favourite colour?",
-            "op_1": "Red",
+            "question": "El pare va a la guerra?",
+            "answers":[{"1":"Sí", "2":"No"}],
+            "options": 2,
             "next": "2",
             "failed" : "1.5"
         },

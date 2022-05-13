@@ -1,13 +1,17 @@
 import * as THREE from 'three';
+import gsap from 'gsap';
 //Based from here https://github.com/mrdoob/three.js/blob/master/examples/webgl_animation_skinning_morph.html
 
 
 import { GUI } from './examples/jsm/libs/lil-gui.module.min.js';
 
 import { GLTFLoader } from './examples/jsm/loaders/GLTFLoader.js';
-
+// Socket.io startup. 
+var socket = io()
 var container, stats, clock, gui, mixer, actions, activeAction, previousAction, timing;
 var camera, scene, renderer, model, face;
+var expressions;
+// *Check user agent*, "computing power"... Because on Mozilla Firefox this website doesn't work at all.
 if(navigator.hardwareConcurrency <= 4) {
     timing = 4
 }
@@ -26,40 +30,44 @@ export function back(){
 
         container = document.createElement( 'div' );
         document.body.appendChild( container );
-
+        // The camera options.
         camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 100 );
-        camera.position.set( - 5, 3, 10 );
+        camera.position.set( 0 , 3, 10 );
         camera.lookAt( new THREE.Vector3( 0, 2, 0 ) );
 
         scene = new THREE.Scene();
-        scene.background = new THREE.Color( 0x2E86FD );
+        // The image that is behind the robot.
+        scene.background = new THREE.TextureLoader().load('/img/background.png')
+        
+        //scene.background = new THREE.Color( 0x2E86FD );
         scene.fog = new THREE.Fog( 0x2E86FD, 20, 100 );
 
         clock = new THREE.Clock();
 
-        // lights
+        // Lights
 
         const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-        hemiLight.position.set( 0, 20, 0 );
+        hemiLight.position.set( 10, 20, 0 );
         scene.add( hemiLight );
 
         const dirLight = new THREE.DirectionalLight( 0xffffff );
-        dirLight.position.set( 0, 20, 10 );
+        dirLight.position.set( 10, 20, 10 );
         scene.add( dirLight );
 
-        // ground
+        // This is the background of the robot. Not too cool. *Try to think of a better one*
 
         const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x000000, depthWrite: false } ) );
         mesh.rotation.x = - Math.PI / 2;
         scene.add( mesh );
 
-
         // model
-
+        // Load the 3D model and set up the animations (emotes and states) | The emotions will be set up later.
         const loader = new GLTFLoader();
         loader.load( '/models/RobotExpressive.glb', function ( gltf ) {
 
             model = gltf.scene;
+            face = model.getObjectByName( 'Head_4' );
+            expressions = Object.keys( face.morphTargetDictionary )
             scene.add( model );
             actions = {};
             mixer = new THREE.AnimationMixer( model );
@@ -79,8 +87,9 @@ export function back(){
                 }
     
             }
-            activeAction = actions[ 'Idle' ];
+            activeAction = actions[ 'Jump' ];
             activeAction.play();
+            fadeToAction("Idle", 0.5)
     
 
 
@@ -89,7 +98,7 @@ export function back(){
             console.error( e );
 
         } );
-
+        // Set up renderer
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
@@ -98,11 +107,10 @@ export function back(){
 
         window.addEventListener( 'resize', onWindowResize );
 
-        // stats
 
     }
     
-
+    // To handle window resizes so it doesn't break the 3D environment.
     function onWindowResize() {
 
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -113,9 +121,8 @@ export function back(){
     }
 
     //
-
+    // The loop that is constantly running, it renders the 3D environment.
     function animate() {
-
         const dt = clock.getDelta();
 
         if ( mixer ) mixer.update( dt );
@@ -127,7 +134,7 @@ export function back(){
 
     }
 }
-
+// Change the animation that the robot is reproducing
 export function fadeToAction( name, duration ) {
 
     previousAction = activeAction;
@@ -149,7 +156,7 @@ export function fadeToAction( name, duration ) {
 }
 
 back()
-
+// Wait for x time.
 function sleep(milliseconds) {
     var start = new Date().getTime();
     for (var i = 0; i < 1e7; i++) {
@@ -158,6 +165,7 @@ function sleep(milliseconds) {
       }
     }
   }
+  // When pressed it will trigger the getQuestion function if the user's lvl is higher than 0
   function changeLVL(valid){
     if(valid == false) return;
     var lvl = localStorage.getItem("lvl")
@@ -165,23 +173,23 @@ function sleep(milliseconds) {
     var wait
     if(lvl != undefined && lvl != null && /[a-zA-Z]/.test(lvl) == false){
         if(lvl == 0){
+           // animate this scene.background = new THREE.Color( 0xc82e0d);
             var msg = `Molt bé ${user}. Comencem doncs!`
             setTimeout(function(){
                 fadeToAction("Idle", 0.5)
                 localStorage.setItem("lvl", 1)
-                changeLVL()
-                timing > 2 ? (wait = 2) : (wait = 1)
-            }, 3000 * (wait))
+                timing > 2 ? (setTimeout(function(){changeLVL()}, 3000)) : (changeLVL())
+            }, 3000)
             fadeToAction("Dance", 0.5)
             escriure(msg, 50)
         }
-        else if(lvl == 1){
-            var msg = `Molt bé ${user}. NIVELL 1`
-            escriure(msg, 50) // Server side.
+        else{
+            getQuestion(user, lvl)
         }
     }
-}
+} // Need to make it global to access it from the DOM
   window.changeLVL = changeLVL
+  // This function animates the typing on the bubble. ¡TRY TO MAKE IT ASYNC SO I CAN WAIT FOR IT TO END AND NOT USE SETTIMEOUT!
   async function escriure(text, speed){
   console.log(text)
   var i = 0;
@@ -207,7 +215,7 @@ function sleep(milliseconds) {
   }
   typeWriter();
   }
-
+  // When a new user gets here, we will show him this.
   setTimeout(function() {
       const scriptPromise = new Promise((resolve, reject) => {
       const bubble = document.createElement('div')
@@ -241,4 +249,76 @@ function sleep(milliseconds) {
       })
       scriptPromise.then(() =>{})
     }, 1000)
-  
+
+    var questioning;
+    var alreadyJumped = false;
+    var alreadyWaved = false;
+    // This function is called on the "start of the loop" or on "the event of the next question button being pressed".
+    function getQuestion(usr, id){
+      socket.emit('question',{user:usr, id:id})
+      questioning = setInterval(() => {
+          if(Math.floor(Math.random() * (5 - 1) + 1) == 1 && alreadyJumped == false){
+            fadeToAction("Jump", 0.5)
+            alreadyJumped = true
+            alreadyWaved = false
+            setTimeout(function(){fadeToAction("Idle", 0.5)}, 1000) 
+        }
+        else if(Math.floor(Math.random() * (5 - 1) + 1) == 2 && alreadyWaved == false){
+          fadeToAction("Wave", 0.5)
+          alreadyWaved = true
+          alreadyJumped = false
+          setTimeout(function(){fadeToAction("Idle", 0.5)}, 1000) 
+        }
+        changeMood(Math.floor(Math.random() * (3 - 0) + 0), Math.random())
+      }, 2000)
+    }
+    // When an option is clicked from the dom, we call this funcion, that will communicate with the server.
+    function checkAnswer(answer, id){
+      clearInterval(questioning)
+      chooseMood(1, 0)
+      chooseMood(2, 0)
+      chooseMood(3, 0)
+    }
+    // Handle incorrect answers. Change background color, ¿some animation?, robot dies.
+    function failedAnswer(){
+      scene.background = new THREE.Color()
+      fadeToAction("Dead", 1)
+    }
+    // Handle correct answers.
+    function correctAnswer(){
+
+    }
+
+    // Create the div with the options to choose from.
+    function createDivWithOptions(OptionsNum, data){
+      function getValues(object, value){
+        return object.map((item) => {
+          return item[value]
+        })
+      }
+      const div = document.createElement("div")
+      div.className = "options"
+      var op = {}
+      var i = 1
+      var items = {1: "one", 2:"two", 3:"three", 4:"four"}
+      while(i <= OptionsNum){
+        var option = getValues(data, i)
+        //logging console.log(option)
+        op[i] = document.createElement("button")
+        op[i].className = "option"
+        op[i].innerHTML = "<b>"+option+"</b>"
+        div.appendChild(op[i])
+        i++
+      }
+        document.body.appendChild(div)
+    }
+
+    // Socket events
+    socket.on('question', (question) => {
+      escriure(question.question, 50)
+      createDivWithOptions(question.options, question.answers)
+    })
+    // Change the mood of the robot to a desired value, there are 3 different moods, and they can be regulated from 0 to 1.
+    function changeMood(mood, num){
+      face.morphTargetInfluences[mood] = num
+    }

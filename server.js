@@ -24,15 +24,15 @@ app.get("/", (req, res) => {
 app.get("/game", (req, res) => {
     res.render('game.ejs')
 })
-app.post("/questions", (req,res) => {
-    const id = req.body.qID
-    const user = req.body.user
-    res.send(jsonQuestions.questions[id])
-    
-})
 //Handle socket.io events
 io.on('connection', (socket) => {
+    socketId = socket.id
     console.log('a user connected');
+    socket.on('question', (question) => {
+        const user = question.user
+        const id = question.id
+        io.to(socketId).emit('question',jsonQuestions.questions[id])
+    })
     socket.on('disconnect', () => {
         console.log('user disconnected');
     });

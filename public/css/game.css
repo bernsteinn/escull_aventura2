@@ -7,3 +7,19 @@ canvas {
     left: 0;
     z-index: -9999;
 }
+.options {
+    display: inline-grid;
+    grid-gap: 25px;
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: 15%;
+    top: 30%;
+    border: 10px;
+      border-top-style: none;
+      border-right-style: none;
+      border-bottom-style: none;
+      border-left-style: none;
+    border-style: groove;
+    padding: 15px;
+  }
