@@ -10,8 +10,14 @@ import { GLTFLoader } from './examples/jsm/loaders/GLTFLoader.js';
 var socket = io()
 var container, stats, clock, gui, mixer, actions, activeAction, previousAction, timing;
 var camera, scene, renderer, model, face;
+var longitude = 0; 
+var totalWritten = 0;
+var written
 var expressions;
 // *Check user agent*, "computing power"... Because on Mozilla Firefox this website doesn't work at all.
+if(navigator.userAgent.match(/mozilla|firefox/i) || navigator.userAgent.match(/safari/i) || navigator.userAgent.match(/edg/i)){
+  alert("You are using an uncompatible browser! Things may work badly")
+}
 if(navigator.hardwareConcurrency <= 4) {
     timing = 4
 }
@@ -170,16 +176,19 @@ function sleep(milliseconds) {
     if(valid == false) return;
     var lvl = localStorage.getItem("lvl")
     var user = localStorage.getItem("user")
-    var wait
     if(lvl != undefined && lvl != null && /[a-zA-Z]/.test(lvl) == false){
         if(lvl == 0){
            // animate this scene.background = new THREE.Color( 0xc82e0d);
             var msg = `Molt bé ${user}. Comencem doncs!`
-            setTimeout(function(){
-                fadeToAction("Idle", 0.5)
-                localStorage.setItem("lvl", 1)
-                timing > 2 ? (setTimeout(function(){changeLVL()}, 3000)) : (changeLVL())
-            }, 3000)
+            var check = setInterval(function(){
+                if(written == true){
+                  clearInterval(check);
+                  written = false;
+                  fadeToAction("Idle", 0.5)
+                  localStorage.setItem("lvl", 1)
+                  changeLVL()
+                }
+            }, 1000)
             fadeToAction("Dance", 0.5)
             escriure(msg, 50)
         }
@@ -195,8 +204,18 @@ function sleep(milliseconds) {
   var i = 0;
   var txt = text;
   var speed = 50; 
+  longitude = 0
+  totalWritten = 0
   document.getElementById("bubble").innerHTML = ""
   function typeWriter() {
+    longitude = txt.length
+    totalWritten += 1
+    console.log(totalWritten)
+    console.log(longitude)
+    let check = new Promise(function(resolve){
+      if(totalWritten - 1 == longitude){resolve()}
+    })
+    check.then((value) => {written = true})  
     if (i < txt.length) {
       if(txt.charAt(i-1) == ":" || txt.charAt(i-1) == "," || txt.charAt(i-1) == "." ){
         sleep(300)
@@ -214,7 +233,7 @@ function sleep(milliseconds) {
     }
   }
   typeWriter();
-  }
+}
   // When a new user gets here, we will show him this.
   setTimeout(function() {
       const scriptPromise = new Promise((resolve, reject) => {
@@ -226,8 +245,10 @@ function sleep(milliseconds) {
       var msg = `Hola ${user}! Benvingut a l'escull la teva aventura del llibre "Ara que estem junts" de Roc Casagran. Estas preparat per a començar?`
       escriure(msg, 500)
       var sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))//loading.io
-      var start = async() =>{        
-        await sleep(7500) * timing
+      var start = setInterval(function() {
+        if(written == true){
+          clearInterval(start)
+          written = false
         fadeToAction("Sitting", 0.5)
         var container = document.getElementById("bubble")
         var newData = ` 
@@ -243,8 +264,8 @@ function sleep(milliseconds) {
           </div>
     `
     container.innerHTML += newData
-      }
-      start()
+        }
+      }, 50)
     
       })
       scriptPromise.then(() =>{})
@@ -316,7 +337,13 @@ function sleep(milliseconds) {
     // Socket events
     socket.on('question', (question) => {
       escriure(question.question, 50)
-      createDivWithOptions(question.options, question.answers)
+      var check = setInterval(() => {
+        if(written == true){
+          clearInterval(check)
+          written = false
+          createDivWithOptions(question.options, question.answers)
+        }
+      })
     })
     // Change the mood of the robot to a desired value, there are 3 different moods, and they can be regulated from 0 to 1.
     function changeMood(mood, num){
