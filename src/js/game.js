@@ -14,9 +14,9 @@ var longitude = 0;
 var totalWritten = 0;
 var written
 var expressions;
-// *Check user agent*, "computing power"... Because on Mozilla Firefox this website doesn't work at all.
-if(navigator.userAgent.match(/mozilla|firefox/i) || navigator.userAgent.match(/safari/i) || navigator.userAgent.match(/edg/i)){
-  alert("You are using an uncompatible browser! Things may work badly")
+// *Check user agent*, "computing power"... Because on Mozilla Firefox and edge browsers this website doesn't work at all.
+if(navigator.userAgent.match(/mozilla|firefox/i) || navigator.userAgent.match(/edg/i)){
+  alert("El navegador que estas utilitzant no funciona correctament amb aquesta pàgina web. Per favor utilitza un altre navegador (Chrome, Chromium, Safari...) ")
 }
 if(navigator.hardwareConcurrency <= 4) {
     timing = 4
