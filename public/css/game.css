@@ -23,3 +23,10 @@ canvas {
     border-style: groove;
     padding: 15px;
   }
+.ui-dialog .ui-corner-all .ui-widget .ui-widget-content .ui-front .ui-draggable .ui-resizable{
+  position: absolute;
+height: auto;
+width: 300px;
+top: 35%;
+left: 43%;
+}

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/css/loadingBody.css"> 
     <script src="/loading-bar.js"></script>
     <link rel="stylesheet" href="/css/game.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
 </head>
 <body class="loadingBody" id="body">
     <div class="ldBar" id="ldBar" data-value="0" data-duration="7"></div>
@@ -32,13 +33,26 @@
   }, 3000)
   bar.set(bar.value+60)
   setTimeout(function() {
-      bar.set(bar.value+50)
+      const scriptPromise = new Promise((resolve, reject) => {
+        var script = document.createElement('script');
+        var script2 = document.createElement('script');
+        script2.src = 'https://code.jquery.com/ui/1.12.1/jquery-ui.js'
+        script.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+        script.onload = resolve
+        script.onerror = reject
+        document.head.appendChild(script)
+        script2.onerror = reject
+        script2.onload = resolve
+        document.head.appendChild(script2)
+    
+      })
+      scriptPromise.then(() =>{bar.set(bar.value+50)})
   }, 4000)
   setTimeout(function() {
       loaded = true
   }, 6000)
   var loadingN = setInterval(() => {
-      if(loaded == true) {
+      if(loaded == true && compatible == true) {
       var loadingBody = document.getElementById("body")
       var loadingBar = document.getElementById("ldBar")
       loadingBody.classList.remove("loadingBody")
@@ -53,6 +67,9 @@
     </script>
 
 <% if(started == true){ %>
+    <div id="dialog" title="Navegador incompatible">
+        <p>El navegador que estas utilitzant no rendeix bé amb aquesta pàgina web. Per a un rendiment superior utilitza Chrome o Chromium. Per a ignorar aquesta advertència, prem la x</p>
+      </div>
     <script>
 
 setTimeout(function() {

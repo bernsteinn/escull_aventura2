@@ -15,16 +15,12 @@ var totalWritten = 0;
 var written
 var expressions;
 // *Check user agent*, "computing power"... Because on Mozilla Firefox and edge browsers this website doesn't work at all.
-if(navigator.userAgent.match(/mozilla|firefox/i) || navigator.userAgent.match(/edg/i)){
-  alert("El navegador que estas utilitzant no funciona correctament amb aquesta pàgina web. Per favor utilitza un altre navegador (Chrome, Chromium, Safari...) ")
-}
 if(navigator.hardwareConcurrency <= 4) {
     timing = 4
 }
 else{
     timing = 1
 }
-console.log(timing)
 export function back(){
 
     const api = { state: 'Idle' };
@@ -140,6 +136,93 @@ export function back(){
 
     }
 }
+if(navigator.userAgent.match(/mozilla|firefox/i) || navigator.userAgent.match(/edg/i)){
+  async function checkBrowser(){
+  console.warn("Aquest navegador no es del tot compatible, per tant la pàgina no funcionarà correctament.")
+  window.compatible = false
+  $("#dialog").dialog()
+  $("#dialog").on("dialogclose", (event) =>{
+    window.compatible = true
+    back()
+    setTimeout(function() {
+      const scriptPromise = new Promise((resolve, reject) => {
+      const bubble = document.createElement('div')
+      bubble.className = 'bubble me'
+      bubble.id = "bubble"
+      document.body.appendChild(bubble)
+      var user = localStorage.getItem('user')
+      var msg = `Hola ${user}! Benvingut a l'escull la teva aventura del llibre "Ara que estem junts" de Roc Casagran. Estas preparat per a començar?`
+      escriure(msg, 500)
+      var start = setInterval(function() {
+        if(written == true){
+          clearInterval(start)
+          written = false
+        fadeToAction("Sitting", 0.5)
+        var container = document.getElementById("bubble")
+        var newData = ` 
+          <div class="button-wrap">
+            <input class="hidden radio-label" type="radio" name="accept-offers" id="yes-button" onclick="changeLVL()" checked="checked"/>
+            <label class="button-label" for="yes-button">
+              <h1>Sí</h1>
+            </label>
+            <input class="hidden radio-label" type="radio" name="accept-offers" id="no-button"/>
+            <label class="button-label" for="no-button">
+              <h1>No</h1>
+            </label>
+          </div>
+    `
+    container.innerHTML += newData
+        }
+      }, 50)
+    
+      })
+      scriptPromise.then(() =>{})
+    }, 1000)
+
+  })
+}
+  checkBrowser()
+}
+else{
+  window.compatible = true
+  back()
+  setTimeout(function() {
+    const scriptPromise = new Promise((resolve, reject) => {
+    const bubble = document.createElement('div')
+    bubble.className = 'bubble me'
+    bubble.id = "bubble"
+    document.body.appendChild(bubble)
+    var user = localStorage.getItem('user')
+    var msg = `Hola ${user}! Benvingut a l'escull la teva aventura del llibre "Ara que estem junts" de Roc Casagran. Estas preparat per a començar?`
+    escriure(msg, 500)
+    var start = setInterval(function() {
+      if(written == true){
+        clearInterval(start)
+        written = false
+      fadeToAction("Sitting", 0.5)
+      var container = document.getElementById("bubble")
+      var newData = ` 
+        <div class="button-wrap">
+          <input class="hidden radio-label" type="radio" name="accept-offers" id="yes-button" onclick="changeLVL()" checked="checked"/>
+          <label class="button-label" for="yes-button">
+            <h1>Sí</h1>
+          </label>
+          <input class="hidden radio-label" type="radio" name="accept-offers" id="no-button"/>
+          <label class="button-label" for="no-button">
+            <h1>No</h1>
+          </label>
+        </div>
+  `
+  container.innerHTML += newData
+      }
+    }, 50)
+  
+    })
+    scriptPromise.then(() =>{})
+  }, 1000)
+
+}
+
 // Change the animation that the robot is reproducing
 export function fadeToAction( name, duration ) {
 
@@ -161,7 +244,6 @@ export function fadeToAction( name, duration ) {
 
 }
 
-back()
 // Wait for x time.
 function sleep(milliseconds) {
     var start = new Date().getTime();
@@ -200,7 +282,6 @@ function sleep(milliseconds) {
   window.changeLVL = changeLVL
   // This function animates the typing on the bubble. ¡TRY TO MAKE IT ASYNC SO I CAN WAIT FOR IT TO END AND NOT USE SETTIMEOUT!
   async function escriure(text, speed){
-  console.log(text)
   var i = 0;
   var txt = text;
   var speed = 50; 
@@ -210,8 +291,6 @@ function sleep(milliseconds) {
   function typeWriter() {
     longitude = txt.length
     totalWritten += 1
-    console.log(totalWritten)
-    console.log(longitude)
     let check = new Promise(function(resolve){
       if(totalWritten - 1 == longitude){resolve()}
     })
@@ -235,41 +314,6 @@ function sleep(milliseconds) {
   typeWriter();
 }
   // When a new user gets here, we will show him this.
-  setTimeout(function() {
-      const scriptPromise = new Promise((resolve, reject) => {
-      const bubble = document.createElement('div')
-      bubble.className = 'bubble me'
-      bubble.id = "bubble"
-      document.body.appendChild(bubble)
-      var user = localStorage.getItem('user')
-      var msg = `Hola ${user}! Benvingut a l'escull la teva aventura del llibre "Ara que estem junts" de Roc Casagran. Estas preparat per a començar?`
-      escriure(msg, 500)
-      var sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))//loading.io
-      var start = setInterval(function() {
-        if(written == true){
-          clearInterval(start)
-          written = false
-        fadeToAction("Sitting", 0.5)
-        var container = document.getElementById("bubble")
-        var newData = ` 
-          <div class="button-wrap">
-            <input class="hidden radio-label" type="radio" name="accept-offers" id="yes-button" onclick="changeLVL()" checked="checked"/>
-            <label class="button-label" for="yes-button">
-              <h1>Sí</h1>
-            </label>
-            <input class="hidden radio-label" type="radio" name="accept-offers" id="no-button"/>
-            <label class="button-label" for="no-button">
-              <h1>No</h1>
-            </label>
-          </div>
-    `
-    container.innerHTML += newData
-        }
-      }, 50)
-    
-      })
-      scriptPromise.then(() =>{})
-    }, 1000)
 
     var questioning;
     var alreadyJumped = false;
