@@ -33,6 +33,16 @@ io.on('connection', (socket) => {
         const id = question.id
         io.to(socketId).emit('question',jsonQuestions.questions[id])
     })
+    socket.on('check', (check) => {
+        const question = check.id
+        const answer = check.content
+        if(jsonQuestions.questions[question].correct[0].option == answer){
+            io.to(socketId).emit('check',jsonQuestions.questions[question].correct[0])
+        }
+        else{
+            io.to(socketId).emit('check',jsonQuestions.questions[question].false[0])
+        }
+    })
     socket.on('disconnect', () => {
         console.log('user disconnected');
     });

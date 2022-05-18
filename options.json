@@ -10,12 +10,16 @@
             "question": "El pare va a la guerra?",
             "answers":[{"1":"Sí", "2":"No"}],
             "options": 2,
-            "next": "2",
-            "failed" : "1.5"
+            "correct":[{"option": 1,"lost":false, 
+                "response":"El pare va a la guerra, deixan't-ho tot endarrere: la seva família, els seus amics i la seva casa.",
+                "next": 1.8}],
+            "failed" :[{"option": 2 ,"next": 0, "lost":true, 
+                "response": "El pare no va a la guerra, es queda a casa amb el Tòfoli tota la família."}]
         },
         "1.5": {
-            "question": "What is your favourite colour?",
-            "op_1": "Red",
+            "question": "En quin bàndol decideix el pare anar a la guerra?",
+            "answers":[{"1":"És republicà (Rojos)", "2":"Era del bàndol nacional (Dictadura militar, Franco)", "3":"No va amb cap bàndol, només hi va perque li sembla divertit i li fa il·lusió."}],
+            "options": 3,
             "next": "2",
             "failed" : "1.8"
         },

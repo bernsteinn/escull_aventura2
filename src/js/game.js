@@ -136,7 +136,15 @@ export function back(){
 
     }
 }
-if(navigator.userAgent.match(/mozilla|firefox/i) || navigator.userAgent.match(/edg/i)){
+// https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
+var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+var isFirefox = typeof InstallTrigger !== 'undefined';
+var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+var isIE = /*@cc_on!@*/false || !!document.documentMode;
+var isEdge = !isIE && !!window.StyleMedia;
+var isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+var isBlink = (isChrome || isOpera) && !!window.CSS;
+if(isOpera || isFirefox || isSafari || isIE || isEdge){
   async function checkBrowser(){
   console.warn("Aquest navegador no es del tot compatible, per tant la pàgina no funcionarà correctament.")
   window.compatible = false
@@ -184,6 +192,7 @@ if(navigator.userAgent.match(/mozilla|firefox/i) || navigator.userAgent.match(/e
   checkBrowser()
 }
 else{
+  var dialog = $("#dialog").hide()
   window.compatible = true
   back()
   setTimeout(function() {
@@ -337,20 +346,42 @@ function sleep(milliseconds) {
         changeMood(Math.floor(Math.random() * (3 - 0) + 0), Math.random())
       }, 2000)
     }
-    // When an option is clicked from the dom, we call this funcion, that will communicate with the server.
-    function checkAnswer(answer, id){
-      clearInterval(questioning)
-      chooseMood(1, 0)
-      chooseMood(2, 0)
-      chooseMood(3, 0)
-    }
     // Handle incorrect answers. Change background color, ¿some animation?, robot dies.
-    function failedAnswer(){
-      scene.background = new THREE.Color()
-      fadeToAction("Dead", 1)
+    function failedAnswer(response){
+      scene.background = new THREE.Color("0x000000")
+      escriure(response, 50)
+      setInterval(function(){
+        if(written == true){
+          fadeToAction("Dead", 0.5)
+          written = false
+        }
+      }, 50)
+    }
+    function MakeNextButtonVisible(){
+      var container = document.getElementById("bubble")
+      var newData = ` 
+        <div class="button-wrap">
+          <input class="hidden radio-label" type="radio" name="accept-offers" id="next-button" onclick="changeLVL()" checked="checked"/>
+          <label class="button-label" for="next-button">
+            <h1>Següent</h1>
+          </label>
+        </div>
+  `
+  container.innerHTML += newData
     }
     // Handle correct answers.
-    function correctAnswer(){
+    function correctAnswer(response, nextlvl){
+        escriure(response, 50)
+        setInterval(function(){
+          if(written == true){
+            fadeToAction("ThumbsUp", 0.5)
+            fadeToAction("Jump", 0.5)
+            fadeToAction("Idle", 0.5)
+            written = false
+            localStorage.setItem("lvl", nextlvl)
+            MakeNextButtonVisible()
+          }
+        }, 50)
 
     }
 
@@ -365,12 +396,14 @@ function sleep(milliseconds) {
       div.className = "options"
       var op = {}
       var i = 1
-      var items = {1: "one", 2:"two", 3:"three", 4:"four"}
       while(i <= OptionsNum){
-        var option = getValues(data, i)
+        var option = getValues(data.answers, i)
         //logging console.log(option)
         op[i] = document.createElement("button")
         op[i].className = "option"
+        op[i].value = '{"content": 1, "id": 1}'
+        op[i].id = `option${i}`
+        op[i].onclick = function(){checkAnswer(JSON.parse(this.value))}
         op[i].innerHTML = "<b>"+option+"</b>"
         div.appendChild(op[i])
         i++
@@ -385,11 +418,28 @@ function sleep(milliseconds) {
         if(written == true){
           clearInterval(check)
           written = false
-          createDivWithOptions(question.options, question.answers)
+          createDivWithOptions(question.options, question)
         }
       })
+    })
+    socket.on('check', (data) => {
+      if(data.lost == false){
+        correctAnswer(data.response, data.next)
+      }
+      else{
+        failedAnswer(data.response)
+      }
     })
     // Change the mood of the robot to a desired value, there are 3 different moods, and they can be regulated from 0 to 1.
     function changeMood(mood, num){
       face.morphTargetInfluences[mood] = num
     }
+        // When an option is clicked from the dom, we call this funcion, that will communicate with the server.
+    function checkAnswer(answer){
+          clearInterval(questioning)
+          socket.emit('check', answer)
+          changeMood(1, 0)
+          changeMood(2, 0)
+          changeMood(3, 0)
+        }
+    

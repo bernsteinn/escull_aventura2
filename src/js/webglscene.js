@@ -149,6 +149,7 @@ export function webgl_support () {
                     if(username){
                         localStorage.setItem("user", username)
                         localStorage.setItem("lvl", 0)
+                        
                         this.start()
                     }
                 })
