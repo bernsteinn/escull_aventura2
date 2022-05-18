@@ -35,12 +35,14 @@ io.on('connection', (socket) => {
     })
     socket.on('check', (check) => {
         const question = check.id
+        console.log(question)
         const answer = check.content
+        console.log(answer)
         if(jsonQuestions.questions[question].correct[0].option == answer){
             io.to(socketId).emit('check',jsonQuestions.questions[question].correct[0])
         }
         else{
-            io.to(socketId).emit('check',jsonQuestions.questions[question].false[0])
+            io.to(socketId).emit('check',jsonQuestions.questions[question].failed[0])
         }
     })
     socket.on('disconnect', () => {

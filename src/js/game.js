@@ -13,6 +13,7 @@ var camera, scene, renderer, model, face;
 var longitude = 0; 
 var totalWritten = 0;
 var written
+var dele;
 var expressions;
 // *Check user agent*, "computing power"... Because on Mozilla Firefox and edge browsers this website doesn't work at all.
 if(navigator.hardwareConcurrency <= 4) {
@@ -295,14 +296,20 @@ function sleep(milliseconds) {
   var txt = text;
   var speed = 50; 
   longitude = 0
+  dele = 0
   totalWritten = 0
   document.getElementById("bubble").innerHTML = ""
   function typeWriter() {
     longitude = txt.length
     totalWritten += 1
+    dele += 1
     let check = new Promise(function(resolve){
       if(totalWritten - 1 == longitude){resolve()}
     })
+    let checkLongitude = new Promise(function(resolve){
+      if(dele > 150 && txt.charAt(i-1) == "."){resolve()}
+    })
+    checkLongitude.then(function(){dele = 0; document.getElementById("bubble").innerHTML = ""; $("#bubble").fadeOut(); sleep(2000);$("#bubble").fadeIn();})
     check.then((value) => {written = true})  
     if (i < txt.length) {
       if(txt.charAt(i-1) == ":" || txt.charAt(i-1) == "," || txt.charAt(i-1) == "." ){
@@ -330,6 +337,7 @@ function sleep(milliseconds) {
     // This function is called on the "start of the loop" or on "the event of the next question button being pressed".
     function getQuestion(usr, id){
       socket.emit('question',{user:usr, id:id})
+      $(".options").remove();
       questioning = setInterval(() => {
           if(Math.floor(Math.random() * (5 - 1) + 1) == 1 && alreadyJumped == false){
             fadeToAction("Jump", 0.5)
@@ -348,11 +356,14 @@ function sleep(milliseconds) {
     }
     // Handle incorrect answers. Change background color, ¿some animation?, robot dies.
     function failedAnswer(response){
-      scene.background = new THREE.Color("0x000000")
+      scene.background = new THREE.TextureLoader().load( '/img/fail.jpg' );
       escriure(response, 50)
+      changeMood(3, 1)
+      changeMood(2, 0.15)
+      fadeToAction("No", 0.5)
       setInterval(function(){
         if(written == true){
-          fadeToAction("Dead", 0.5)
+          fadeToAction("Death", 0.5)
           written = false
         }
       }, 50)
@@ -360,12 +371,12 @@ function sleep(milliseconds) {
     function MakeNextButtonVisible(){
       var container = document.getElementById("bubble")
       var newData = ` 
-        <div class="button-wrap">
-          <input class="hidden radio-label" type="radio" name="accept-offers" id="next-button" onclick="changeLVL()" checked="checked"/>
-          <label class="button-label" for="next-button">
-            <h1>Següent</h1>
-          </label>
-        </div>
+      <div>
+        <button type="button" class="slide" onclick=changeLVL()>
+        <div>Següent</div>
+        <i class="icon-arrow-right"></i>
+        </button>   
+        </div>     
   `
   container.innerHTML += newData
     }
@@ -394,6 +405,9 @@ function sleep(milliseconds) {
       }
       const div = document.createElement("div")
       div.className = "options"
+      if(OptionsNum == 2) {
+        div.style.display = "grid"
+      }
       var op = {}
       var i = 1
       while(i <= OptionsNum){
@@ -401,7 +415,7 @@ function sleep(milliseconds) {
         //logging console.log(option)
         op[i] = document.createElement("button")
         op[i].className = "option"
-        op[i].value = '{"content": 1, "id": 1}'
+        op[i].value = `{"content": "${i}", "id": "${data.id}"}`
         op[i].id = `option${i}`
         op[i].onclick = function(){checkAnswer(JSON.parse(this.value))}
         op[i].innerHTML = "<b>"+option+"</b>"
@@ -424,6 +438,28 @@ function sleep(milliseconds) {
     })
     socket.on('check', (data) => {
       if(data.lost == false){
+        var origx = camera.position.x
+        var origy = camera.position.y
+        var origz = camera.position.z
+        gsap.to(camera.position,{
+          duration: 4,
+          z: -3,
+          x: -45,
+          y:15,
+
+          ease: "power3.inOut",
+        })
+        $("#bubble").fadeOut()
+        window.addEventListener('mousedown', () => {
+          gsap.to(camera.position,{
+            duration: 4,
+            z: origz,
+            x: origx,
+            y: origy,
+            ease: "power3.inOut",
+          })
+          $("#bubble").fadeIn()
+        })
         correctAnswer(data.response, data.next)
       }
       else{
@@ -436,6 +472,7 @@ function sleep(milliseconds) {
     }
         // When an option is clicked from the dom, we call this funcion, that will communicate with the server.
     function checkAnswer(answer){
+          $(".options").remove();
           clearInterval(questioning)
           socket.emit('check', answer)
           changeMood(1, 0)
