@@ -310,7 +310,7 @@ function sleep(milliseconds) {
       if(dele > 150 && txt.charAt(i-1) == "."){resolve()}
     })
     checkLongitude.then(function(){dele = 0; document.getElementById("bubble").innerHTML = ""; $("#bubble").fadeOut(); sleep(2000);$("#bubble").fadeIn();})
-    check.then((value) => {written = true})  
+    check.then((value) => {written = true})  
     if (i < txt.length) {
       if(txt.charAt(i-1) == ":" || txt.charAt(i-1) == "," || txt.charAt(i-1) == "." ){
         sleep(300)
@@ -404,6 +404,11 @@ function sleep(milliseconds) {
         })
       }
       const div = document.createElement("div")
+      const span1 = document.createElement("span")
+      const span2 = document.createElement("span")
+      const span3 = document.createElement("span")
+      const span4 = document.createElement("span")
+      div.appendChild(span1, span2, span3, span4)
       div.className = "options"
       if(OptionsNum == 2) {
         div.style.display = "grid"
