@@ -22,8 +22,8 @@
             "answers":[{"1":"És republicà (Rojos)", "2":"És del bàndol nacional (Franco)", "3":"No va amb cap bàndol, només hi va perque li sembla entretingut"}],
             "id": 1.5,
             "options": 3,
-            "next": "2",
-            "failed" : "1.8"
+            "correct":[],
+            "failed":[]
         },
         "1.8" : {
             "question": "What is your favourite colour?",
