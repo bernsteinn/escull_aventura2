@@ -38,12 +38,24 @@ io.on('connection', (socket) => {
         console.log(question)
         const answer = check.content
         console.log(answer)
-        if(jsonQuestions.questions[question].correct[0].option == answer){
-            io.to(socketId).emit('check',jsonQuestions.questions[question].correct[0])
+        if(question > 1){
+        for(i = 0; i<3; i++){
+        if(jsonQuestions.questions[question].correct[0].option[i] == answer){
+            io.to(socketId).emit('check',jsonQuestions.questions[question].correct[i])
+            return
         }
+        } 
+        io.to(socketId).emit('check',jsonQuestions.questions[question].failed[0])
+        } 
         else{
-            io.to(socketId).emit('check',jsonQuestions.questions[question].failed[0])
-        }
+            if(jsonQuestions.questions[question].correct[0].option[0] == answer){
+                io.to(socketId).emit('check',jsonQuestions.questions[question].correct[0])
+            }
+            else{
+                io.to(socketId).emit('check',jsonQuestions.questions[question].failed[0])
+            }
+        } 
+        
     })
     socket.on('disconnect', () => {
         console.log('user disconnected');

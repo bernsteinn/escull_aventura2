@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import gsap from 'gsap';
+import Swal from 'sweetalert2'
 //Based from here https://github.com/mrdoob/three.js/blob/master/examples/webgl_animation_skinning_morph.html
 
 
@@ -14,7 +15,27 @@ var longitude = 0;
 var totalWritten = 0;
 var written
 var dele;
+var sound;
+var longer;
 var expressions;
+var longResponses = false;
+var soundTurned = false;
+//Audio from Music: https://www.chosic.com/free-music/all/ 
+var music = new Audio('/sounds/music.mp3');
+var next = new Audio('/sounds/next.wav');
+var failed = new Audio('/sounds/failed.wav');
+/* Playing In The Wind by BatchBug | https://soundcloud.com/batchbug/
+Music promoted by https://www.chosic.com/free-music/all/
+Creative Commons CC BY 3.0
+https://creativecommons.org/licenses/by/3.0/
+*/
+var playerLost = new Audio('/sounds/lost.mp3');
+
+function reproduceSoundNext(){
+  if(soundTurned == true){
+    next.play();
+  }
+}
 // *Check user agent*, "computing power"... Because on Mozilla Firefox and edge browsers this website doesn't work at all.
 if(navigator.hardwareConcurrency <= 4) {
     timing = 4
@@ -22,10 +43,56 @@ if(navigator.hardwareConcurrency <= 4) {
 else{
     timing = 1
 }
+
 export function back(){
 
     const api = { state: 'Idle' };
+    var ajustos = document.getElementById('config')
+    ajustos.innerHTML = `        <div class="switch-holder">
+    <div class="switch-label">
+        <i class="fa fas fa-angle-double-right"></i><span>Respostes allargades</span>
+    </div>
+    <div class="switch-toggle">
+        <input type="checkbox" id="longer">
+        <label for="longer"></label>
+    </div>
+</div>
 
+<div class="switch-holder">
+    <div class="switch-label">
+        <i class="fa fas fa-volume-up"></i><span>Música</span>
+    </div>
+    <div class="switch-toggle">
+        <input type="checkbox" id="sound">
+        <label for="sound"></label>
+    </div>
+</div>
+
+`
+    longer = document.getElementById("longer")
+    sound = document.getElementById("sound")
+    longer.addEventListener('change', function(){
+        if(longer.checked){
+          longResponses = true;
+        }
+        else{
+          longResponses = false;
+        }
+      })
+    sound.addEventListener('change', function(){
+        if(sound.checked){
+          soundTurned = true;
+          music.play();
+          music.volume = 0.5
+          music.loop = true;
+        }
+        else{
+          soundTurned = false;
+          music.volume = 0;
+          playerLost.volume = 0
+          music.loop = false;
+        }
+      })
     init();
     animate();
 
@@ -283,6 +350,7 @@ function sleep(milliseconds) {
             }, 1000)
             fadeToAction("Dance", 0.5)
             escriure(msg, 50)
+            console.log("wat")
         }
         else{
             getQuestion(user, lvl)
@@ -307,7 +375,7 @@ function sleep(milliseconds) {
       if(totalWritten - 1 == longitude){resolve()}
     })
     let checkLongitude = new Promise(function(resolve){
-      if(dele > 150 && txt.charAt(i-1) == "."){resolve()}
+      if(dele > 300 && txt.charAt(i-1) == "."){resolve()}
     })
     checkLongitude.then(function(){dele = 0; document.getElementById("bubble").innerHTML = ""; $("#bubble").fadeOut(); sleep(2000);$("#bubble").fadeIn();})
     check.then((value) => {written = true})  
@@ -357,12 +425,41 @@ function sleep(milliseconds) {
     // Handle incorrect answers. Change background color, ¿some animation?, robot dies.
     function failedAnswer(response){
       scene.background = new THREE.TextureLoader().load( '/img/fail.jpg' );
+      if(soundTurned == true){
+        music.pause();
+        failed.play();
+        playerLost.play();
+      }
       escriure(response, 50)
       changeMood(3, 1)
       changeMood(2, 0.15)
       fadeToAction("No", 0.5)
       setInterval(function(){
         if(written == true){
+          Swal.fire({
+            title: 'Has perdut!',
+            text: 'Vols tornar-ho a provar?',
+            icon: 'warning',
+            showCancelButton: true,
+            cancelButtonText: 'No, gràcies',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, vull tornar-ho a provar!'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              fadeToAction("Idle", 0.5)
+              localStorage.setItem("lvl", 1)
+              scene.background = new THREE.TextureLoader().load('/img/background.png')
+              playerLost.pause();
+              music.play();
+              music.volume = 0.5;
+              changeLVL()
+            }
+            else{
+                console.log("wtf")
+            }
+          })
+          localStorage.setItem("lvl",1)
           fadeToAction("Death", 0.5)
           written = false
         }
@@ -372,13 +469,15 @@ function sleep(milliseconds) {
       var container = document.getElementById("bubble")
       var newData = ` 
       <div>
-        <button type="button" class="slide" onclick=changeLVL()>
+        <button type="button" id="nextBTN"class="slide" onclick="changeLVL()">
         <div>Següent</div>
         <i class="icon-arrow-right"></i>
         </button>   
         </div>     
   `
   container.innerHTML += newData
+  var nextBTN = document.getElementById("nextBTN")
+  nextBTN.addEventListener("click", reproduceSoundNext)
     }
     // Handle correct answers.
     function correctAnswer(response, nextlvl){
@@ -404,14 +503,10 @@ function sleep(milliseconds) {
         })
       }
       const div = document.createElement("div")
-      const span1 = document.createElement("span")
-      const span2 = document.createElement("span")
-      const span3 = document.createElement("span")
-      const span4 = document.createElement("span")
-      div.appendChild(span1, span2, span3, span4)
       div.className = "options"
       if(OptionsNum == 2) {
         div.style.display = "grid"
+        div.style.height = "150px"
       }
       var op = {}
       var i = 1
@@ -422,7 +517,7 @@ function sleep(milliseconds) {
         op[i].className = "option"
         op[i].value = `{"content": "${i}", "id": "${data.id}"}`
         op[i].id = `option${i}`
-        op[i].onclick = function(){checkAnswer(JSON.parse(this.value))}
+        op[i].addEventListener("click",function(){checkAnswer(JSON.parse(this.value))})
         op[i].innerHTML = "<b>"+option+"</b>"
         div.appendChild(op[i])
         i++
@@ -442,7 +537,7 @@ function sleep(milliseconds) {
       })
     })
     socket.on('check', (data) => {
-      if(data.lost == false){
+      if(data.lost == false && longResponses == true){
         var origx = camera.position.x
         var origy = camera.position.y
         var origz = camera.position.z
@@ -451,24 +546,95 @@ function sleep(milliseconds) {
           z: -3,
           x: -45,
           y:15,
+          onComplete: renderDIV,
 
           ease: "power3.inOut",
         })
+        function renderDIV(){
+        var extended = document.createElement("div")
+        var advise = document.createElement("h1")
+        advise.innerHTML = "Clica a qualsevol part de la pantalla per a tornar al joc."
+        advise.className = "click-advice"
+        document.body.appendChild(advise)
+        extended.className = "extended"
+        extended.innerHTML = `${data.extended}`
+        document.body.appendChild(extended)
+        }
         $("#bubble").fadeOut()
-        window.addEventListener('mousedown', () => {
+        function animationDone(){
+          $("#bubble").fadeIn();$(".extended").remove(); $(".click-advice").remove();correctAnswer(data.response, data.next)
+          window.removeEventListener('mousedown', animationLeft)
+        }
+        function animationLeft(){
+          $(".extended").fadeOut(3000)
+          $(".click-advice").fadeOut(3000)
           gsap.to(camera.position,{
             duration: 4,
             z: origz,
             x: origx,
             y: origy,
+            onComplete: animationDone,
             ease: "power3.inOut",
           })
-          $("#bubble").fadeIn()
-        })
+
+        }
+        window.addEventListener('mousedown', animationLeft)
+      }
+      else if(data.lost == false){
         correctAnswer(data.response, data.next)
       }
-      else{
-        failedAnswer(data.response)
+        else{
+          if(longResponses == true){
+            var origx = camera.position.x
+            var origy = camera.position.y
+            var origz = camera.position.z
+            gsap.to(camera.position,{
+              duration: 4,
+              z: -3,
+              x: -45,
+              y:15,
+              onComplete: renderDIV,
+    
+              ease: "power3.inOut",
+            })
+            function renderDIV(){
+            var extended = document.createElement("div")
+            var advise = document.createElement("h1")
+            advise.innerHTML = "Clica a qualsevol part de la pantalla per a tornar al joc."
+            advise.className = "click-advice"
+            document.body.appendChild(advise)    
+            extended.className = "extended"
+            extended.innerHTML = `${data.extended}`
+            document.body.appendChild(extended)
+            }
+            $("#bubble").fadeOut()
+            if(soundTurned == true){
+              music.pause();
+              playerLost.play();
+            }
+            function animationDone(){
+              $("#bubble").fadeIn();$(".extended").remove();failedAnswer(data.response)
+              window.removeEventListener('mousedown', animationLeft)
+            }
+            function animationLeft(){
+              $(".click-advice").fadeOut(3000)
+              $(".extended").fadeOut(3000)
+              gsap.to(camera.position,{
+                duration: 4,
+                z: origz,
+                x: origx,
+                y: origy,
+                onComplete: animationDone,
+                ease: "power3.inOut",
+              })
+    
+            }
+            window.addEventListener('mousedown', animationLeft)
+    
+          }
+          else{
+            failedAnswer(data.response)
+          }
       }
     })
     // Change the mood of the robot to a desired value, there are 3 different moods, and they can be regulated from 0 to 1.
