@@ -482,13 +482,14 @@ function sleep(milliseconds) {
     // Handle correct answers.
     function correctAnswer(response, nextlvl){
         escriure(response, 50)
-        setInterval(function(){
+        var correctTyped = setInterval(function(){
           if(written == true){
             fadeToAction("ThumbsUp", 0.5)
             fadeToAction("Jump", 0.5)
             fadeToAction("Idle", 0.5)
             written = false
             localStorage.setItem("lvl", nextlvl)
+            clearInterval(correctTyped)
             MakeNextButtonVisible()
           }
         }, 50)
