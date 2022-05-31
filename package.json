@@ -23,6 +23,7 @@
     "gsap": "^3.10.4",
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.6.0",
+    "serve-favicon": "^2.5.0",
     "socket.io": "^4.4.1",
     "sweetalert2": "^11.4.14",
     "three": "^0.139.2",
