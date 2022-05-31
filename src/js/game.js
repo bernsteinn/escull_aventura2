@@ -353,7 +353,8 @@ function sleep(milliseconds) {
             console.log("wat")
         }
         else{
-            getQuestion(user, lvl)
+          lvl = localStorage.getItem("lvl")
+          getQuestion(user, lvl)
         }
     }
 } // Need to make it global to access it from the DOM
