@@ -9,14 +9,13 @@ const socket = require('socket.io');
 const io = socket(server);
 const jsonQuestions = require('./options.json');
 const bodyparser = require('body-parser');
-const favicon = require('serve-favicon');
 
 
 //App configuration.
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, '/public')));
-app.use(favicon(path.join(__dirname, '/public/img/favicon.ico')));
+app.use('/favicon.ico', express.static(__dirname + '/favicon.icopublic/img/favicon.ico'));
 //Set view engine ejs
 app.set('view engine', 'ejs');
 //Routes
