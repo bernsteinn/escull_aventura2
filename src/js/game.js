@@ -24,16 +24,25 @@ var soundTurned = false;
 var music = new Audio('/sounds/music.mp3');
 var next = new Audio('/sounds/next.wav');
 var failed = new Audio('/sounds/failed.wav');
+var win = new Audio('/sounds/win.wav');
 /* Playing In The Wind by BatchBug | https://soundcloud.com/batchbug/
 Music promoted by https://www.chosic.com/free-music/all/
 Creative Commons CC BY 3.0
 https://creativecommons.org/licenses/by/3.0/
 */
 var playerLost = new Audio('/sounds/lost.mp3');
+var winTrack = new Audio('/sounds/win-track.mp3')
 
 function reproduceSoundNext(){
   if(soundTurned == true){
     next.play();
+  }
+}
+function reproduceSoundWin(){
+  if(soundTurned == true){
+    music.pause();
+    win.play();
+    winTrack.play();
   }
 }
 // *Check user agent*, "computing power"... Because on Mozilla Firefox and edge browsers this website doesn't work at all.
@@ -82,22 +91,25 @@ export function back(){
     sound.addEventListener('change', function(){
         if(sound.checked){
           soundTurned = true;
-          music.play();
           music.volume = 0.5
           music.loop = true;
+          winTrack.volume = 1
         }
         else{
           soundTurned = false;
           music.volume = 0;
           playerLost.volume = 0
           music.loop = false;
+          winTrack.volume = 0;
+
         }
       })
     init();
     animate();
 
     function init() {
-
+        music.volume = 0;
+        music.play();
         container = document.createElement( 'div' );
         document.body.appendChild( container );
         // The camera options.
@@ -481,7 +493,7 @@ function sleep(milliseconds) {
   nextBTN.addEventListener("click", reproduceSoundNext)
     }
     // Handle correct answers.
-    function correctAnswer(response, nextlvl){
+    function correctAnswer(response, nextlvl, status){
         escriure(response, 50)
         var correctTyped = setInterval(function(){
           if(written == true){
@@ -491,7 +503,43 @@ function sleep(milliseconds) {
             written = false
             localStorage.setItem("lvl", nextlvl)
             clearInterval(correctTyped)
+            if(status == "win"){
+              localStorage.setItem("lvl",1)
+              reproduceSoundWin();
+              fadeToAction("Dance", 3)
+              fadeToAction("ThumbsUp", 2)
+              fadeToAction("Jump", 1)
+              fadeToAction("Dance", 0.5)
+              Swal.fire({
+                title: 'Has guanyat!',
+                text: 'Vols tornar-ho a provar?',
+                icon: 'success',
+                showCancelButton: true,
+                cancelButtonText: 'No, gràcies',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, vull tornar-ho a provar!'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  fadeToAction("Idle", 0.5)
+                  localStorage.setItem("lvl", 1)
+                  scene.background = new THREE.TextureLoader().load('/img/background.png')
+                  playerLost.pause();
+                  winTrack.pause();
+
+                  music.play();
+                  music.volume = 0.5;
+                  changeLVL()
+                }
+                else{
+                    console.log("wtf")
+                }
+              })
+              written = false
+            }
+          else{
             MakeNextButtonVisible()
+          }
           }
         }, 50)
 
@@ -564,7 +612,7 @@ function sleep(milliseconds) {
         }
         $("#bubble").fadeOut()
         function animationDone(){
-          $("#bubble").fadeIn();$(".extended").remove(); $(".click-advice").remove();correctAnswer(data.response, data.next)
+          $("#bubble").fadeIn();$(".extended").remove(); $(".click-advice").remove();if(data.won == true){correctAnswer(data.response, data.next, "win")}else{correctAnswer(data.response, data.next)}
           window.removeEventListener('mousedown', animationLeft)
         }
         function animationLeft(){
@@ -583,7 +631,7 @@ function sleep(milliseconds) {
         window.addEventListener('mousedown', animationLeft)
       }
       else if(data.lost == false){
-        correctAnswer(data.response, data.next)
+        if(data.won == true){correctAnswer(data.response, data.next, "win")}else{correctAnswer(data.response, data.next)}
       }
         else{
           if(longResponses == true){
