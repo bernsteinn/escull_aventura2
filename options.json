@@ -48,8 +48,8 @@
             "answers": [{"1":"Paracaigudisme", "2":"Barranquisme"}],
             "id":2,
             "options":2,
-            "correct":[{"option":[1],"lost":false,"won":true,"response":"Es fa paracaigudista i es treu el títol de mestre. Obre la seva pròpia academia i viu una vida feliç a Mexic.","extended":"Coneix una mestre de paracaigudisme i s'aficiona al paracaigudisme. Mitjançant molt d'esforç, aconsegueix arribar a ser un mestre a Mèxic i viu una vida feliç."}],
-            "failed" : [{"option":2,"lost":true,"response":"Es mor fent barranquisme, amb una desafortunada caiguda.","extended":""}]
+            "correct":[{"option":[1],"lost":false,"won":true,"response":"Es fa paracaigudista i es treu el títol de mestre. Obre la seva pròpia acadèmia i viu una vida feliç a Mèxic.","extended":"Coneix una mestre de paracaigudisme i s'aficiona al paracaigudisme. Mitjançant molt d'esforç, aconsegueix arribar a ser un mestre a Mèxic i viu una vida feliç."}],
+            "failed" : [{"option":2,"lost":true,"response":"Es mor fent barranquisme, amb una desafortunada caiguda.","extended":"Es mor fent barranquisme amb dos amics seus que sobreviuen, amb una desafortunada caiguda. Ell queda realitzat, perque després de la guerra, es va adonar de que els esports de risc eren el que a ell li agradava."}]
         }
     },
     "lvls" : {
